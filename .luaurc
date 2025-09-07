@@ -1,0 +1,10 @@
+{
+    "languageMode": "strict",
+    "lint": {
+        "FunctionUnused": false
+    },
+    "aliases": {
+        "tdkit": "src",
+        "tiniest": "tests/lib"
+    }
+}
