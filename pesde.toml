@@ -1,10 +1,11 @@
 name = '0jewell/tdkit'
+description = 'Roblox Tower Defense utilities'
 version = '0.1.0'
 authors = ['0jewell']
 repository = 'https://github.com/0jewell/td-kit'
 license = 'MIT'
 
-includes = ['src', 'pesde.toml', 'pesde.lock']
+includes = ['src', 'LICENSE', 'pesde.toml', 'pesde.lock']
 
 [target]
 environment = 'roblox'
