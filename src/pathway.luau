@@ -43,7 +43,7 @@ end
 local function pathway_new()
     local pathway = { nodes = {}, total_length = 0 }
 
-    local function inner_node_new(details: ordered_node_details)
+    function pathway.new_node(details: ordered_node_details): node
         local node = node_new({
             start = details.start,
             ending = details.ending,
@@ -53,83 +53,6 @@ local function pathway_new()
 
         table.insert(pathway.nodes, node)
         return node
-    end
-
-    function pathway.build_from_waypoints(waypoints_folder: Instance)
-        pathway.nodes = {}
-        pathway.total_length = 0
-        
-        local children = waypoints_folder:GetChildren()
-        local valid_waypoints = {}
-
-        for _, child in ipairs(children) do
-            local index = tonumber(child.Name)
-            if index == nil then
-                error(`invalid child at waypoints folder: {child.Name}`)
-            end
-
-            local attachment = child:FindFirstChildWhichIsA('Attachment')
-
-            if attachment then
-                local waypoint = {
-                    index = index,
-                    attachment = attachment,
-                }
-                table.insert(valid_waypoints, waypoint)
-            end
-        end
-
-        table.sort(valid_waypoints, function(a, b) return a.index < b.index end)
-
-        for i = 1, #valid_waypoints - 1 do
-            local current = valid_waypoints[i].attachment
-            local next = valid_waypoints[i + 1].attachment
-            
-            inner_node_new({
-                start = current.WorldPosition,
-                ending = next.WorldPosition
-            })
-        end
-
-        return pathway
-    end
-
-    function pathway.build_from_attachments(root_part: BasePart): pathway
-        pathway.nodes = {}
-        pathway.total_length = 0
-
-        local attachment = root_part:FindFirstChild('0') :: Attachment
-        if not attachment then error(`invalid rootpart at {root_part.Name}`) end
-        
-        repeat
-            local next_ref = attachment:FindFirstAncestorWhichIsA('ObjectValue')
-            if not next_ref or not next_ref.Value then break end
-
-            local next_attachment = next_ref.Value :: Attachment
-
-            inner_node_new({
-                start = attachment.WorldPosition,
-                ending = next_attachment.WorldPosition
-            })
-
-            attachment = next_attachment
-        until false
-
-        return pathway
-    end
-
-    function pathway.build_from_positions(positions: { Vector3 }): pathway
-        pathway.nodes = {}
-        pathway.total_length = 0
-        
-        for i = 1, #positions - 1 do
-            inner_node_new({
-                start = positions[i],
-                ending = positions[i + 1]
-            })
-        end
-
-        return pathway
     end
 
     local function find_node_for_length(
@@ -241,7 +164,6 @@ local function pathway_new()
     end
 
     -- exports
-    pathway.new_node = inner_node_new
     pathway.position_in_node = calculate_position_in_node
     pathway.find_node_for_length = find_node_for_length
     pathway.calculate_distance = calculate_distance
@@ -250,7 +172,92 @@ local function pathway_new()
     return pathway
 end
 
+local function build_from_waypoints(waypoints_folder: Instance)
+    local pathway = pathway_new()
+
+    local children = waypoints_folder:GetChildren()
+    local valid_waypoints = {}
+
+    for _, child in ipairs(children) do
+        local index = tonumber(child.Name)
+        if index == nil then
+            error(`invalid child at waypoints folder: {child.Name}`)
+        end
+
+        local attachment = child:FindFirstChildWhichIsA('Attachment')
+
+        if attachment then
+            local waypoint = {
+                index = index,
+                attachment = attachment,
+            }
+            table.insert(valid_waypoints, waypoint)
+        end
+    end
+
+    table.sort(valid_waypoints, function(a, b)
+        return a.index < b.index
+    end)
+
+    for i = 1, #valid_waypoints - 1 do
+        local current = valid_waypoints[i].attachment
+        local next = valid_waypoints[i + 1].attachment
+
+        pathway.new_node {
+            start = current.WorldPosition,
+            ending = next.WorldPosition,
+        }
+    end
+
+    return pathway
+end
+
+local function build_from_attachments(root_part: BasePart): pathway
+    local pathway = pathway_new()
+
+    local attachment = root_part:FindFirstChild('0') :: Attachment
+    if not attachment then
+        error(`invalid rootpart at {root_part.Name}`)
+    end
+
+    repeat
+        local next_ref = attachment:FindFirstAncestorWhichIsA('ObjectValue')
+        if not next_ref or not next_ref.Value then
+            break
+        end
+
+        local next_attachment = next_ref.Value :: Attachment
+
+        pathway.new_node {
+            start = attachment.WorldPosition,
+            ending = next_attachment.WorldPosition,
+        }
+
+        attachment = next_attachment
+    until false
+
+    return pathway
+end
+
+local function build_from_positions(positions: { Vector3 }): pathway
+    local pathway = pathway_new()
+
+    for i = 1, #positions - 1 do
+        pathway.new_node {
+            start = positions[i],
+            ending = positions[i + 1],
+        }
+    end
+
+    return pathway
+end
+
 export type node = typeof(node_new(_G))
 export type pathway = typeof(pathway_new())
 
-return pathway_new
+return {
+    new = pathway_new,
+    build_from_waypoints = build_from_waypoints,
+    build_from_attachments = build_from_attachments,
+    build_from_positions = build_from_positions
+}
