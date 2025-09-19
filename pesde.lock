@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 format = 2
 name = "0jewell/tdkit"
-version = "0.1.0"
+version = "0.1.1"
 target = "roblox"
 
 [graph."0x5eal/unzip@0.1.3 luau".pkg_ref]
@@ -71,7 +71,7 @@ ref_ty = "pesde"
 index_url = "https://github.com/pesde-pkg/index"
 
 [graph."pesde/rojo@7.5.1 lune"]
-direct = ["rojo", { name = "pesde/rojo", version = "^7.5.1", index = "default", target = "lune" }, "standard"]
+direct = ["rojo", { name = "pesde/rojo", version = "^7.5.1", index = "default", target = "lune" }, "dev"]
 
 [graph."pesde/rojo@7.5.1 lune".dependencies]
 core = ["pesde/toolchainlib@0.1.15 lune", "standard"]

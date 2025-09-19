@@ -1,11 +1,11 @@
 name = '0jewell/tdkit'
 description = 'Roblox Tower Defense utilities'
-version = '0.1.0'
+version = '0.1.1'
 authors = ['0jewell']
 repository = 'https://github.com/0jewell/td-kit'
 license = 'MIT'
 
-includes = ['src', 'LICENSE', 'pesde.toml', 'pesde.lock']
+includes = ['src/*', 'LICENSE', 'README.md', 'pesde.toml']
 
 [target]
 environment = 'roblox'
@@ -19,5 +19,5 @@ default = 'https://github.com/pesde-pkg/index'
 roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
 sourcemap_generator = ".pesde/scripts/sourcemap_generator.luau"
 
-[dependencies]
+[dev_dependencies]
 rojo = { name = 'pesde/rojo', version = '^7.5.1', target = 'lune' }
