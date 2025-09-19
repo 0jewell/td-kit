@@ -5,6 +5,7 @@ export type node = pathway.node
 export type traveller = pathway.traveller
 
 local intersection = require('@self/intersection')
+export type intersection = intersection.intersection
 
 -- export
 return {
