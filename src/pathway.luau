@@ -11,9 +11,6 @@ export type partial_traveller = {
     current_index: number,
     last_length: number
 }
-export type traveller = partial_traveller & {
-    current_length: number
-}
 
 -- this
 local function node_new(details: new_node_details)
@@ -255,6 +252,7 @@ end
 
 export type node = typeof(node_new(_G))
 export type pathway = typeof(pathway_new())
+export type traveller = typeof(pathway_new().traveller())
 
 return {
     new = pathway_new,
