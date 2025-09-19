@@ -15,6 +15,7 @@ export type traveller = partial_traveller & {
     current_length: number
 }
 
+-- this
 local function node_new(details: new_node_details)
     local start_length = details.start_length
 
@@ -257,7 +258,7 @@ export type pathway = typeof(pathway_new())
 
 return {
     new = pathway_new,
-    build_from_waypoints = build_from_waypoints,
-    build_from_attachments = build_from_attachments,
-    build_from_positions = build_from_positions
+    from_waypoints = build_from_waypoints,
+    from_attachments = build_from_attachments,
+    from_positions = build_from_positions
 }
