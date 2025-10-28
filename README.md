@@ -29,11 +29,10 @@ local pathway = tdkit.from_positions(positions)
 Creating a traveller (enemy)
 
 ```luau
-local enemy = pathway.traveller()
+local enemy = pathway.traveller({ speed = 8 })
 
 while not enemy.is_at_end() do
-    enemy.move(1) -- move 1 stud per tick
-    task.wait(0.1)
+    enemy.move(task.wait())
 end
 ```
 

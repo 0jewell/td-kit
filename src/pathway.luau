@@ -185,7 +185,7 @@ local function pathway_new()
         end
 
         function traveller.is_at_end(): boolean
-            return traveller.current_length >= pathway.total_length
+            return traveller.get_length() >= pathway.total_length
         end
 
         function traveller.move(deltaTime: number): number
