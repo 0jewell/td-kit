@@ -3,6 +3,7 @@ local pathway = require('@self/pathway')
 export type pathway = pathway.pathway
 export type node = pathway.node
 export type traveller = pathway.traveller
+export type traveller_settings = pathway.traveller_settings
 
 local intersection = require('@self/intersection')
 export type intersection = intersection.intersection
