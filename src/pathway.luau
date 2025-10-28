@@ -173,39 +173,46 @@ end
 local function build_from_waypoints(waypoints_folder: Instance)
     local pathway = pathway_new()
 
-    local children = waypoints_folder:GetChildren()
-    local valid_waypoints = {}
+    local function build()
+        pathway.nodes = {}
+        pathway.total_length = 0
 
-    for _, child in ipairs(children) do
-        local index = tonumber(child.Name)
-        if index == nil then
-            error(`invalid child at waypoints folder: {child.Name}`)
+        local children = waypoints_folder:GetChildren()
+        local valid_waypoints = {}
+
+        for _, child in ipairs(children) do
+            local index = tonumber(child.Name)
+            if index ~= nil then
+                local attachment = child:FindFirstChildWhichIsA("Attachment")
+
+                if attachment then
+                    table.insert(valid_waypoints, {
+                        index = index,
+                        attachment = attachment,
+                    })
+                end
+            end
         end
 
-        local attachment = child:FindFirstChildWhichIsA('Attachment')
+        table.sort(valid_waypoints, function(a, b)
+            return a.index < b.index
+        end)
 
-        if attachment then
-            local waypoint = {
-                index = index,
-                attachment = attachment,
+        for i = 1, #valid_waypoints - 1 do
+            local current = valid_waypoints[i].attachment
+            local next = valid_waypoints[i + 1].attachment
+
+            pathway.new_node {
+                start = current.WorldPosition,
+                ending = next.WorldPosition,
             }
-            table.insert(valid_waypoints, waypoint)
         end
     end
+    build()
 
-    table.sort(valid_waypoints, function(a, b)
-        return a.index < b.index
-    end)
-
-    for i = 1, #valid_waypoints - 1 do
-        local current = valid_waypoints[i].attachment
-        local next = valid_waypoints[i + 1].attachment
-
-        pathway.new_node {
-            start = current.WorldPosition,
-            ending = next.WorldPosition,
-        }
-    end
+    -- connections
+    waypoints_folder.ChildAdded:Connect(build)
+    waypoints_folder.ChildRemoved:Connect(build)
 
     return pathway
 end
