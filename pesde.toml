@@ -1,6 +1,6 @@
 name = '0jewell/tdkit'
 description = 'Roblox Tower Defense utilities'
-version = '0.2.0'
+version = '0.2.2'
 authors = ['0jewell']
 repository = 'https://github.com/0jewell/td-kit'
 license = 'MIT'
