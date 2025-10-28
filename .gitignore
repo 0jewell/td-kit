@@ -1,5 +1,8 @@
 drafts
 
+# lock files
+*.lock
+
 # pesde
 luau_packages
 lune_packages
