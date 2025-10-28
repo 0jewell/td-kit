@@ -8,6 +8,7 @@ export type new_node_details = ordered_node_details & {
 }
 
 export type partial_traveller = {
+    speed: number,
     current_index: number
 }
 export type traveller_settings = {
@@ -58,8 +59,8 @@ local function pathway_new()
 
     local function find_node_for_length(
         current_length: number,
-        search_direction: number,
-        last_index: number
+        last_index: number,
+        search_direction: number
     ): number
         local start_index = math.clamp(last_index, 1, #pathway.nodes)
 
@@ -84,8 +85,7 @@ local function pathway_new()
 
     local function get_traveller_position(
         traveller: partial_traveller,
-        current_length: number,
-        direction: number
+        current_length: number
     ): Vector3
         if #pathway.nodes == 0 then
             return Vector3.new()
@@ -102,7 +102,8 @@ local function pathway_new()
         end
 
         -- if not, find the correct node
-        local new_index = find_node_for_length(current_length, direction, traveller.current_index)
+        local search_direction = traveller.speed >= 0 and 1 or 0
+        local new_index = find_node_for_length(current_length, traveller.current_index, search_direction)
         traveller.current_index = new_index
 
         local target_node = pathway.nodes[new_index]
@@ -132,28 +133,22 @@ local function pathway_new()
             current_index = 0,
 
             last_update = os.clock(),
-            speed = settings.speed or 1,
-            direction = 1,
-            frozen = false
+            speed = settings.speed or 1
         }
 
         function traveller.get_length()
             local length = traveller.current_length
-        
-            if not traveller.frozen then
-                local now = os.clock()
-                local elapsed_time = now - traveller.last_update
-                local distance = elapsed_time * traveller.speed * traveller.direction
-                
-                length = calculate_distance(length, distance)
-            end
 
-            return length
+            local now = os.clock()
+            local elapsed_time = now - traveller.last_update
+            local distance = elapsed_time * traveller.speed
+
+            return calculate_distance(length, distance)
         end
 
         function traveller.update_and_get_length()
             local length = traveller.get_length()
-            
+
             traveller.current_length = length
             traveller.last_update = os.clock()
             return length
@@ -164,24 +159,9 @@ local function pathway_new()
             traveller.speed = new_speed
         end
 
-        function traveller.set_direction(new_direction: number)
-            traveller.update_and_get_length()
-            traveller.direction = new_direction >= 0 and 1 or -1
-        end
-
-        function traveller.freeze()
-            traveller.update_and_get_length()
-            traveller.frozen = true
-        end
-
-        function traveller.unfreeze()
-            traveller.update_and_get_length()
-            traveller.frozen = false
-        end
-
         function traveller.get_position(): Vector3
             local current_length = traveller.get_length() -- readonly
-            return get_traveller_position(traveller, current_length, traveller.direction)
+            return get_traveller_position(traveller, current_length)
         end
 
         function traveller.is_at_end(): boolean
@@ -189,11 +169,7 @@ local function pathway_new()
         end
 
         function traveller.move(deltaTime: number): number
-            if traveller.frozen then
-                return traveller.current_length
-            end
-
-            local distance = deltaTime * traveller.speed * traveller.direction
+            local distance = deltaTime * traveller.speed
             local new_length = calculate_distance(traveller.current_length, distance)
 
             traveller.current_length = new_length
