@@ -102,7 +102,7 @@ local function pathway_new()
         end
 
         -- if not, find the correct node
-        local search_direction = traveller.speed >= 0 and 1 or 0
+        local search_direction = math.sign(traveller.speed)
         local new_index = find_node_for_length(current_length, traveller.current_index, search_direction)
         traveller.current_index = new_index
 
