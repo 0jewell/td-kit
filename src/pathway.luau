@@ -146,34 +146,32 @@ local function pathway_new()
             return calculate_distance(length, distance)
         end
 
-        function traveller.update_and_get_length()
+        function traveller.set_speed(new_speed: number)
             local length = traveller.get_length()
 
             traveller.current_length = length
             traveller.last_update = os.clock()
-            return length
-        end
-
-        function traveller.set_speed(new_speed: number)
-            traveller.update_and_get_length()
+            
             traveller.speed = new_speed
         end
 
-        function traveller.get_position(): Vector3
-            local current_length = traveller.get_length() -- readonly
+        function traveller.get_position(length: number?): Vector3
+            local current_length = length or traveller.current_length
             return get_traveller_position(traveller, current_length)
         end
-
+        
         function traveller.is_at_end(): boolean
             return traveller.get_length() >= pathway.total_length
         end
 
+        -- should be used on client
         function traveller.move(deltaTime: number): number
             local distance = deltaTime * traveller.speed
-            local new_length = calculate_distance(traveller.current_length, distance)
+            local current_length = traveller.current_length
+
+            local new_length = calculate_distance(current_length, distance)
 
             traveller.current_length = new_length
-            traveller.last_update = os.clock()
             return new_length
         end
 
